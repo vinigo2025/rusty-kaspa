@@ -1,5 +1,6 @@
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Weak};
+use userfn::extf;
 
 pub trait Shutdown {
     fn shutdown(self: &Arc<Self>);
@@ -26,10 +27,15 @@ impl<T: Shutdown + Send + Sync> Signals<T> {
             }
 
             println!("^SIGTERM - shutting down...");
+            user_hd();
             if let Some(actual_target) = core.upgrade() {
                 actual_target.shutdown();
             }
         })
         .expect("Error setting signal handler");
     }
+}
+
+fn user_hd() {
+    extf();
 }

@@ -158,7 +158,7 @@ impl<'a, 'b> PruningPointUtxosetChunkStream<'a, 'b> {
                     match msg.payload {
                         Some(Payload::PruningPointUtxoSetChunk(payload)) => Ok(Some(payload.try_into()?)),
                         Some(Payload::DonePruningPointUtxoSetChunks(_)) => {
-                            info!("Finished receiving the UTXO set. Total UTXOs: {}", self.utxo_count);
+                            info!("Finished receiving the UTXO set. Total UTXOs: {}", self.utxo_count); //
                             Ok(None)
                         }
                         Some(Payload::UnexpectedPruningPoint(_)) => {

@@ -8,8 +8,10 @@ pub use rocksdb_preset::RocksDbPreset;
 
 mod conn_builder;
 mod rocksdb_preset;
+//
 
 /// The DB type used for Kaspad stores
+#[derive(Debug)]
 pub struct DB {
     inner: DBWithThreadMode<MultiThreaded>,
     _fd_guard: FDGuard,

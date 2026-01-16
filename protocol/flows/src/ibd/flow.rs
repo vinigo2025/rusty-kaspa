@@ -1,3 +1,4 @@
+#![allow(unused)]
 use crate::{
     flow_context::FlowContext,
     flow_trait::Flow,
@@ -60,6 +61,7 @@ impl Flow for IbdFlow {
     }
 
     async fn start(&mut self) -> Result<(), ProtocolError> {
+        info!("#### Start ####");
         self.start_impl().await
     }
 }
@@ -222,7 +224,7 @@ impl IbdFlow {
             n => info!("IBD post processing: unorphaned {} blocks ...{}", n, unorphaned_hashes.last().unwrap()),
         }
 
-        Ok(())
+        Ok(()) //
     }
 
     async fn determine_ibd_type(
@@ -678,7 +680,7 @@ staging selected tip ({}) is too small or negative. Aborting IBD...",
                     multiset
                 })
                 .await;
-        }
+        } //
         consensus.clone().spawn_blocking(move |c| c.import_pruning_point_utxo_set(pruning_point, multiset)).await?;
         Ok(())
     }

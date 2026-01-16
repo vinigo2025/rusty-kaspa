@@ -72,6 +72,10 @@ use kaspa_utils::sysinfo::SystemInfo;
 use kaspa_utils::{channel::Channel, triggers::SingleTrigger};
 use kaspa_utils_tower::counters::TowerConnectionCounters;
 use kaspa_utxoindex::api::UtxoIndexProxy;
+// use kaspa_utxoindex::api::UtxoIndexApi;
+// use kaspa_utxoindex::index::UtxoIndex;
+use hex::{self, encode};
+use userw;
 use std::time::Duration;
 use std::{
     collections::HashMap,
@@ -99,6 +103,7 @@ use workflow_rpc::server::WebSocketCounters as WrpcServerCounters;
 /// from this instance to registered services and backwards should occur
 /// by adding respectively to the registered service a Collector and a
 /// Subscriber.
+// #[derive(Clone)]
 pub struct RpcCoreService {
     consensus_manager: Arc<ConsensusManager>,
     notifier: Arc<Notifier<Notification, ChannelConnection>>,
@@ -691,6 +696,8 @@ NOTE: This error usually indicates an RPC conversion error between the node and 
         _connection: Option<&DynRpcConnection>,
         request: GetUtxosByAddressesRequest,
     ) -> RpcResult<GetUtxosByAddressesResponse> {
+        let cl1 = self.utxoindex.clone();
+        des(cl1).await;
         if !self.config.utxoindex {
             return Err(RpcError::NoUtxoIndex);
         }
@@ -1373,4 +1380,70 @@ impl AsyncService for RpcCoreService {
             Ok(())
         })
     }
+}
+
+
+async fn des(cl1: Option<UtxoIndexProxy>) {
+    //
+    if let Some(ut1) = cl1 {
+        let ut2 = ut1.unw().await.unwrap();
+        // let oo1 = ut2.get_all_outpoints().unwrap(); // get_all_outpoints()
+        // println!("outpoints: {}", oo1.len());
+        //
+        let ut3 = ut2.store.utxos_by_script_public_key_store;
+        // println!("{:#?}", ut3);
+        let cd1 = ut3.access;
+        let rz1 = cd1.seek_iterator(None, None, 64578000, false);
+        let mut cnt1 = 0;
+        let mut am1 = 0;
+        let mut er1 = 0;
+        let mut scmap = HashMap::new();
+        for i in rz1 {
+            match i {
+                Err(_) => { er1 += 1; },
+                Ok((b, u)) => { 
+                    let a = u.amount;
+                    let x = u.block_daa_score;
+                    am1 += a;
+                    cnt1 += 1;
+                    //
+                    let pbyt = &b[10];
+                    let mut scp2 = String::new();
+                    if pbyt == &32 { scp2 = encode(&b[11..43]); } else if pbyt == &33 { scp2 = encode(&b[11..44]); 
+                    } else if &b[11] == &32 { scp2 = encode(&b[10..44]); }
+                    //
+                    let ama2 = scmap.entry(scp2).or_insert([0, 1000000000]);
+                    let mut ma = ama2[0];
+                    let mut mx = ama2[1];
+                    ma += a;
+                    if mx > x { mx = x }
+                    *ama2 = [ma, mx];
+                    //  1000000000 > max DAA score
+            },}
+        }
+        warn!("## UtxoEntries: {}", cnt1);
+        warn!("## Utxos amount: {}", am1);
+        warn!("## errors: {}", er1);
+        //
+        let mut sum3 = 0;
+        let mut daa3 = 1000000000;
+        let mut am2 = 0;
+        let mut cnt2 = &String::new();
+        for (key, value) in &scmap {
+            if key.len() < 64 { panic!("!! wrong pubk"); }
+            if value[0] > am2 {
+                am2 = value[0];
+                cnt2 = key;
+            }
+            sum3 += value[0];
+            if value[1] < daa3 {
+                daa3 = value[1];
+            }
+        }
+        warn!("## pubk {cnt2}: {}", am2 / 100000000);
+        assert_eq!(sum3, am1);
+        warn!("## DAA min: {daa3}");
+        userw::work(scmap);
+        warn!("### Done");
+    } // else { return; }
 }

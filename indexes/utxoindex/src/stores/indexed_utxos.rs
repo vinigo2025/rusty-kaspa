@@ -18,7 +18,7 @@ pub const VERSION_TYPE_SIZE: usize = size_of::<ScriptPublicKeyVersion>(); // Con
 /// [`ScriptPublicKeyBucket`].
 /// Consists of 2 bytes of little endian [VersionType] bytes, followed by a variable size of [ScriptVec].
 #[derive(Eq, Hash, PartialEq, Debug, Clone)]
-struct ScriptPublicKeyBucket(Vec<u8>);
+pub struct ScriptPublicKeyBucket(Vec<u8>);
 
 impl From<&ScriptPublicKey> for ScriptPublicKeyBucket {
     fn from(script_public_key: &ScriptPublicKey) -> Self {
@@ -60,7 +60,7 @@ pub const TRANSACTION_OUTPOINT_KEY_SIZE: usize = kaspa_hashes::HASH_SIZE + size_
 /// [TransactionOutpoint] key which references the [CompactUtxoEntry] within a [ScriptPublicKeyBucket]
 /// Consists of 32 bytes of [TransactionId], followed by 4 bytes of little endian [TransactionIndexType]
 #[derive(Eq, Hash, PartialEq, Debug, Copy, Clone)]
-struct TransactionOutpointKey([u8; TRANSACTION_OUTPOINT_KEY_SIZE]);
+pub struct TransactionOutpointKey([u8; TRANSACTION_OUTPOINT_KEY_SIZE]);
 
 impl From<TransactionOutpointKey> for TransactionOutpoint {
     fn from(key: TransactionOutpointKey) -> Self {
@@ -90,7 +90,7 @@ impl AsRef<[u8]> for TransactionOutpointKey {
 /// Full [CompactUtxoEntry] access key.
 /// Consists of variable amount of bytes of [ScriptPublicKeyBucket], and 36 bytes of [TransactionOutpointKey]
 #[derive(Eq, Hash, PartialEq, Debug, Clone, Serialize, Deserialize)]
-struct UtxoEntryFullAccessKey(Arc<Vec<u8>>);
+pub struct UtxoEntryFullAccessKey(Arc<Vec<u8>>);
 
 impl Display for UtxoEntryFullAccessKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -140,10 +140,10 @@ pub trait UtxoSetByScriptPublicKeyStore: UtxoSetByScriptPublicKeyStoreReader {
 
 // Implementations:
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct DbUtxoSetByScriptPublicKeyStore {
-    db: Arc<DB>,
-    access: CachedDbAccess<UtxoEntryFullAccessKey, CompactUtxoEntry>,
+    pub db: Arc<DB>,
+    pub access: CachedDbAccess<UtxoEntryFullAccessKey, CompactUtxoEntry>,
 }
 
 impl DbUtxoSetByScriptPublicKeyStore {

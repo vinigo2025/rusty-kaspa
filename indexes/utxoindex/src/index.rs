@@ -27,7 +27,7 @@ const RESYNC_CHUNK_SIZE: usize = 2048; // Increased from 1k (used in go-kaspad),
 /// please follow guidelines found in the comments under `utxoindex::core::api::UtxoIndexApi` for proper thread safety.
 pub struct UtxoIndex {
     consensus_manager: Arc<ConsensusManager>,
-    store: Store,
+    pub store: Store,
     /// A runtime value holding a monotonic supply value. Used to prevent supply fluctuations due
     /// to the single round gap between fee deduction and its payment to miners
     monotonic_circulating_supply: CirculatingSupply,
@@ -193,6 +193,16 @@ impl UtxoIndexApi for UtxoIndex {
     // This can have a big memory footprint, so it should be used only for tests.
     fn get_all_outpoints(&self) -> StoreResult<std::collections::HashSet<kaspa_consensus_core::tx::TransactionOutpoint>> {
         self.store.get_all_outpoints()
+    }
+
+    fn unw(&self) -> UtxoIndexResult<UtxoIndex> {
+        //
+        let st = self.store.clone();
+        let cn = self.consensus_manager.clone();
+        let su = self.monotonic_circulating_supply;
+        Ok( UtxoIndex { consensus_manager: cn, 
+                        store: st, 
+                        monotonic_circulating_supply: su, } )
     }
 }
 

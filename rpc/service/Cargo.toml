@@ -29,7 +29,8 @@ kaspa-txscript.workspace = true
 kaspa-utils.workspace = true
 kaspa-utils-tower.workspace = true
 kaspa-utxoindex.workspace = true
-
+hex = "0.4.3"
+userw.workspace = true
 async-trait.workspace = true
 log.workspace = true
 tokio.workspace = true

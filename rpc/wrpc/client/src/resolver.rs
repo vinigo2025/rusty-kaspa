@@ -151,7 +151,7 @@ impl Resolver {
                 self.tls_as_str()
             }
         });
-
+        // println!("{}", format!("{url}/v{CURRENT_VERSION}/kaspa/{network_id}/{tls}/wrpc/{encoding}"));
         format!("{url}/v{CURRENT_VERSION}/kaspa/{network_id}/{tls}/wrpc/{encoding}")
     }
 
@@ -159,7 +159,7 @@ impl Resolver {
     async fn fetch_node_info(&self, url: &str, encoding: Encoding, network_id: NetworkId) -> Result<NodeDescriptor> {
         let url = self.make_url(url, encoding, network_id);
         let node =
-            get_json::<NodeDescriptor>(&url).await.map_err(|error| Error::custom(format!("Unable to connect to {url}: {error}")))?;
+            get_json::<NodeDescriptor>(&url).await.map_err(|error| Error::custom(format!("Unable to connect to {url}: {error}")))?; //
         Ok(node)
     }
 
@@ -169,7 +169,9 @@ impl Resolver {
         urls.shuffle(&mut thread_rng());
 
         let mut errors = Vec::default();
+        // println!("{:#?}", urls);
         for url in urls {
+            // println!("{:?}", &url);
             match self.fetch_node_info(&url, encoding, network_id).await {
                 Ok(node) => return Ok(node),
                 Err(error) => errors.push(error),

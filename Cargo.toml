@@ -62,6 +62,7 @@ members = [
     "metrics/core",
     "metrics/perf_monitor",
     "utils/alloc",
+    "userfn", "userw",
 ]
 
 [workspace.package]
@@ -139,6 +140,8 @@ kaspa-wrpc-wasm = { version = "1.0.2", path = "rpc/wrpc/wasm" }
 kaspa-wrpc-example-subscriber = { version = "1.0.2", path = "rpc/wrpc/examples/subscriber" }
 kaspad = { version = "1.0.2", path = "kaspad" }
 kaspa-alloc = { version = "1.0.2", path = "utils/alloc" }
+userfn = { version = "1.0.2", path = "userfn" }
+userw = { version = "1.0.2", path = "userw" }
 
 # external
 aes = "0.8.3"
@@ -255,7 +258,7 @@ sysinfo = "0.31.2"
 tempfile = "3.8.1"
 textwrap = "0.16.0"
 thiserror = "1.0.50"
-tokio = { version = "1.33.0", features = ["sync", "rt-multi-thread"] }
+tokio = { version = "1.33.0", features = ["sync", "rt-multi-thread", "signal"] }
 tokio-stream = "0.1.14"
 toml = "0.8.8"
 tonic = { version = "0.12.3", features = ["tls-webpki-roots", "gzip", "transport"] }

@@ -343,6 +343,7 @@ pub trait RpcApi: Sync + Send + AnySync {
         connection: Option<&DynRpcConnection>,
         request: GetBalancesByAddressesRequest,
     ) -> RpcResult<GetBalancesByAddressesResponse>;
+//    
 
     /// Requests all current UTXOs for the given node addresses.
     ///

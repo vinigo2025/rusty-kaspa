@@ -1,3 +1,4 @@
+// #![allow(unused)]
 // Basic example of a Kaspa wRPC client that connects to a node
 // and subscribes to notifications. This example demonstrates
 // how to handle RPC connection events, perform subscriptions,
@@ -6,6 +7,8 @@
 pub use futures::{select, select_biased, FutureExt, Stream, StreamExt, TryStreamExt};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
+// use tokio::time::{sleep, Duration};
+// use tokio::signal;
 
 // We use workflow-rs primitives for async task and channel management
 // as they function uniformly in tokio as well as WASM32 runtimes.
@@ -141,6 +144,7 @@ impl Listener {
     // generic notification handler fn called by the event task
     async fn handle_notification(&self, notification: Notification) -> Result<()> {
         log_info!("Notification: {notification:?}");
+        // sleep(Duration::from_secs(10)).await;
         Ok(())
     }
 
@@ -151,6 +155,9 @@ impl Listener {
         // make an RPC method call to the node...
         let server_info = self.client().get_server_info().await?;
         log_info!("Server info: {server_info:?}");
+
+        // panic!("Stop here");
+
 
         // now that we have successfully connected we
         // can register for notifications

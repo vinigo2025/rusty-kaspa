@@ -5,9 +5,10 @@ use kaspa_utils::mem_size::MemSizeEstimator;
 use rocksdb::{Direction, IterateBounds, IteratorMode, ReadOptions};
 use serde::{de::DeserializeOwned, Serialize};
 use std::{collections::hash_map::RandomState, error::Error, hash::BuildHasher, sync::Arc};
+//
 
 /// A concurrent DB store access with typed caching.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct CachedDbAccess<TKey, TData, S = RandomState>
 where
     TKey: Clone + std::hash::Hash + Eq + Send + Sync,
@@ -217,7 +218,7 @@ where
     pub fn seek_iterator(
         &self,
         bucket: Option<&[u8]>,   // iter self.prefix if None, else append bytes to self.prefix.
-        seek_from: Option<TKey>, // iter whole range if None
+        seek_from: Option<TKey>, // iter whole range if None  //
         limit: usize,            // amount to take.
         skip_first: bool,        // skips the first value, (useful in conjunction with the seek-key, as to not re-retrieve).
     ) -> impl Iterator<Item = KeyDataResult<TData>> + '_
@@ -293,7 +294,7 @@ mod tests {
 
     #[test]
     fn test_read_with_fallback() {
-        let (_lifetime, db) = create_temp_db!(ConnBuilder::default().with_files_limit(10));
+        let (_lifetime, db) = create_temp_db!(ConnBuilder::default().with_files_limit(10));  //
         let primary_prefix = vec![1];
         let fallback_prefix = vec![2];
         let access = CachedDbAccess::<Hash, u64>::new(db.clone(), CachePolicy::Count(10), primary_prefix);

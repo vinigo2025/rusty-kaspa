@@ -13,6 +13,7 @@ use std::{collections::HashSet, fmt::Debug, sync::Arc};
 use crate::{
     errors::UtxoIndexResult,
     model::{UtxoChanges, UtxoSetByScriptPublicKey},
+    index::UtxoIndex,
 };
 
 ///Utxoindex API targeted at retrieval calls.
@@ -53,17 +54,23 @@ pub trait UtxoIndexApi: Send + Sync + Debug {
     ///
     /// Note: Use a write lock when accessing this method
     fn resync(&mut self) -> UtxoIndexResult<()>;
+
+    fn unw(&self) -> UtxoIndexResult<UtxoIndex>;
 }
 
 /// Async proxy for the UTXO index
 #[derive(Debug, Clone)]
 pub struct UtxoIndexProxy {
-    inner: Arc<RwLock<dyn UtxoIndexApi>>,
+    pub inner: Arc<RwLock<dyn UtxoIndexApi>>,
 }
 
 impl UtxoIndexProxy {
     pub fn new(inner: Arc<RwLock<dyn UtxoIndexApi>>) -> Self {
         Self { inner }
+    }
+
+    pub async fn unw(self) -> UtxoIndexResult<UtxoIndex> {
+        spawn_blocking(move || self.inner.read().unw()).await.unwrap()
     }
 
     pub async fn get_circulating_supply(self) -> StoreResult<u64> {

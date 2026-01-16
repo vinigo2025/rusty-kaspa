@@ -6,6 +6,7 @@ use kaspa_database::{
 };
 
 use kaspa_consensus_core::BlockHashSet;
+//
 
 /// Reader API for `UtxoIndexTipsStore`.
 pub trait UtxoIndexTipsStoreReader {

@@ -232,9 +232,12 @@ impl RpcResolver for Inner {
             url
         } else if let Some(resolver) = self.resolver().as_ref() {
             let network_id = self.network_id().expect("Resolver requires network id in RPC client configuration");
+            // println!("{:?}", resolver);  ??
             let node = resolver.get_node(self.encoding, network_id).await.map_err(WebSocketError::custom)?;
             let url = node.url.clone();
+            // println!("URL: {url}");
             self.node_descriptor.lock().unwrap().replace(Arc::new(node));
+            // println!("URL: {url}");
             url
         } else {
             panic!("RpcClient resolver configuration error (expecting `url` or `resolver` as `Some(Resolver))`")
@@ -478,6 +481,7 @@ impl KaspaRpcClient {
 
         self.inner.rpc_client.shutdown().await?;
         self.stop().await?;
+        //
         Ok(())
     }
 

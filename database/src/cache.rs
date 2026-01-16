@@ -16,7 +16,7 @@ pub enum CachePolicy {
     Tracked { max_size: usize, min_items: usize, mem_mode: MemMode },
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct CachePolicyInner {
     /// Indicates if this cache was set to be tracked.
     tracked: bool,
@@ -40,7 +40,7 @@ impl From<CachePolicy> for CachePolicyInner {
         }
     }
 }
-
+#[derive(Debug)]
 struct Inner<TKey, TData, S = RandomState>
 where
     TKey: Clone + std::hash::Hash + Eq + Send + Sync,
@@ -123,7 +123,7 @@ where
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Cache<TKey, TData, S = RandomState>
 where
     TKey: Clone + std::hash::Hash + Eq + Send + Sync,

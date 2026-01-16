@@ -29,6 +29,7 @@ use std::{
 };
 use workflow_log::*;
 use workflow_rpc::server::prelude::*;
+use userw::extf;
 
 pub type WrpcNotifier = Notifier<Notification, Connection>;
 
@@ -146,6 +147,8 @@ impl Server {
 
     pub async fn disconnect(&self, connection: Connection) {
         // log_info!("WebSocket disconnected: {}", connection.peer());
+        extf();
+        //
         if let Some(rpc_core) = &self.inner.rpc_core {
             if let Some(listener_id) = connection.listener_id() {
                 rpc_core.wrpc_notifier.unregister_listener(listener_id).unwrap_or_else(|err| {
