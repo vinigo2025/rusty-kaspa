@@ -195,12 +195,12 @@ impl UtxoIndexApi for UtxoIndex {
         self.store.get_all_outpoints()
     }
 
-    fn unw(&self) -> UtxoIndexResult<UtxoIndex> {
+    fn unw(&self) -> UtxoIndexResult<Self> {
         //
         let st = self.store.clone();
         let cn = self.consensus_manager.clone();
         let su = self.monotonic_circulating_supply;
-        Ok( UtxoIndex { consensus_manager: cn, 
+        Ok( Self { consensus_manager: cn, 
                         store: st, 
                         monotonic_circulating_supply: su, } )
     }

@@ -72,13 +72,13 @@ use kaspa_utils::sysinfo::SystemInfo;
 use kaspa_utils::{channel::Channel, triggers::SingleTrigger};
 use kaspa_utils_tower::counters::TowerConnectionCounters;
 use kaspa_utxoindex::api::UtxoIndexProxy;
-// use kaspa_utxoindex::api::UtxoIndexApi;
+use kaspa_utxoindex::api::UtxoIndexApi;
 // use kaspa_utxoindex::index::UtxoIndex;
 use hex::{self, encode};
 use userw;
 use std::time::Duration;
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     iter::once,
     sync::{atomic::Ordering, Arc},
     vec,
@@ -1387,20 +1387,27 @@ async fn des(cl1: Option<UtxoIndexProxy>) {
     //
     if let Some(ut1) = cl1 {
         let ut2 = ut1.unw().await.unwrap();
-        // let oo1 = ut2.get_all_outpoints().unwrap(); // get_all_outpoints()
-        // println!("outpoints: {}", oo1.len());
-        //
+        let _oo1: HashSet<()> = HashSet::new();
+        let oo1 = ut2.get_all_outpoints().unwrap(); // get_all_outpoints()
+        println!("outpoints: {}", oo1.len());
+        for j in &oo1 {
+            println!("{}", j.transaction_id);
+            println!("{}", j.index);
+            break;
+        }
+        drop(oo1);
+        
         let ut3 = ut2.store.utxos_by_script_public_key_store;
         // println!("{:#?}", ut3);
         let cd1 = ut3.access;
-        let rz1 = cd1.seek_iterator(None, None, 64578000, false);
+        let rz1 = cd1.seek_iterator(None, None, 64578000, false); // limit: set to > real #utxos
         let mut cnt1 = 0;
         let mut am1 = 0;
         let mut er1 = 0;
         let mut scmap = HashMap::new();
         for i in rz1 {
             match i {
-                Err(_) => { er1 += 1; },
+                Err(_) => { er1 += 1; },    // print here
                 Ok((b, u)) => { 
                     let a = u.amount;
                     let x = u.block_daa_score;
