@@ -1389,7 +1389,7 @@ async fn des(cl1: Option<UtxoIndexProxy>) {
         let ut2 = ut1.unw().await.unwrap();
         let _oo1: HashSet<()> = HashSet::new();
         let oo1 = ut2.get_all_outpoints().unwrap(); // get_all_outpoints()
-        println!("outpoints: {}", oo1.len());
+        warn!("## outpoints: {}", oo1.len());
         for j in &oo1 {
             println!("{}", j.transaction_id);
             println!("{}", j.index);
