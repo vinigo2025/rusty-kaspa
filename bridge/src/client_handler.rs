@@ -11,8 +11,8 @@ use num_traits::Zero;
 use parking_lot::Mutex;
 use regex::Regex;
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicI32, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicI32, Ordering};
 use std::time::{Duration, Instant};
 use tracing::{debug, error, warn};
 
@@ -97,13 +97,8 @@ impl ClientHandler {
             // Calculate max extranonce for size 2
             let max_extranonce = (2_f64.powi(16) - 1.0) as i32; // 2 bytes = 16 bits = 65535
 
-            let next = GLOBAL_NEXT_EXTRANONCE.fetch_update(Ordering::SeqCst, Ordering::SeqCst, |val| {
-                if val < max_extranonce {
-                    Some(val + 1)
-                } else {
-                    Some(0)
-                }
-            });
+            let next = GLOBAL_NEXT_EXTRANONCE
+                .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |val| if val < max_extranonce { Some(val + 1) } else { Some(0) });
 
             if next.is_err() || next.unwrap() >= max_extranonce {
                 warn!("wrapped extranonce! new clients may be duplicating work...");
@@ -498,14 +493,14 @@ impl ClientHandler {
                     let wallet_addr = client_clone.wallet_addr.lock();
                     if wallet_addr.is_empty() {
                         let connect_time = state.connect_time();
-                        if let Ok(elapsed) = connect_time.elapsed() {
-                            if elapsed > CLIENT_TIMEOUT {
-                                warn!("client misconfigured, no miner address specified - disconnecting");
-                                let wallet_str = wallet_addr.clone();
-                                record_worker_error(&instance_id, &wallet_str, crate::errors::ErrorShortCode::NoMinerAddress.as_str());
-                                drop(wallet_addr); // Drop before disconnect
-                                client_clone.disconnect();
-                            }
+                        if let Ok(elapsed) = connect_time.elapsed()
+                            && elapsed > CLIENT_TIMEOUT
+                        {
+                            warn!("client misconfigured, no miner address specified - disconnecting");
+                            let wallet_str = wallet_addr.clone();
+                            record_worker_error(&instance_id, &wallet_str, crate::errors::ErrorShortCode::NoMinerAddress.as_str());
+                            drop(wallet_addr); // Drop before disconnect
+                            client_clone.disconnect();
                         }
                         debug!("new_block_available: client {} has no wallet address yet, skipping", client_clone.remote_addr);
                         return;

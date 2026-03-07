@@ -4,7 +4,7 @@
 // how to handle RPC connection events, perform subscriptions,
 // handle subscription notifications etc.
 
-pub use futures::{select, select_biased, FutureExt, Stream, StreamExt, TryStreamExt};
+pub use futures::{FutureExt, Stream, StreamExt, TryStreamExt, select, select_biased};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 // use tokio::time::{sleep, Duration};
@@ -12,7 +12,7 @@ use std::sync::{Arc, Mutex};
 
 // We use workflow-rs primitives for async task and channel management
 // as they function uniformly in tokio as well as WASM32 runtimes.
-use workflow_core::channel::{oneshot, Channel, DuplexChannel};
+use workflow_core::channel::{Channel, DuplexChannel, oneshot};
 use workflow_core::task::spawn;
 use workflow_log::prelude::*;
 
